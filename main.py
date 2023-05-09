@@ -9,7 +9,7 @@ import json
 from router import validator_of_time, validator_data_of_courier, isnumeric, validator_data_of_orders, validator_of_completed_order, validator_data_for_rating
 from router import limiter
 
-conn = psycopg2.connect(user="postgres", password="tonykart", database="dt_for_yandex")
+conn = psycopg2.connect(user="postgres", password="password")
 conn.autocommit = True
 
 def get_application() -> FastAPI:
@@ -138,7 +138,6 @@ async def get_orders():
                     {"order_id": int(response[i][0]), "weight": float(response[i][3]),
                      "regions": int(response[i][4]), "delivery_hours": [response[i][2]],
                      "cost": int(response[i][1]),
-                     #"completed_time": datetime.datetime.strftime(response[i][7], "%Y-%m-%d %H:%M:%S.%f"),
                      "completed_time": str(response[i][7])})
             return json.dumps(valide_list)
 
@@ -203,9 +202,7 @@ async def get_courier_by_id(id_courier):
         )
         data_of_courier = cursor.fetchall()
         if len(data_of_courier) == 0:
-            #return HTTPException(status_code=404, detail="Not found")
             return {}
-        #if validator_of_time(data_of_courier[0][1][:5]) == True and validator_of_time(data_of_courier[0][1][6:]) == True and len(data_of_courier) != 0:
         else:
             data_of_courier_valide = {"courier_id": int(data_of_courier[0][0]), "courier_type": str(data_of_courier[0][3]),
                                       "regions": [int(data_of_courier[0][2])],
@@ -226,7 +223,6 @@ async def get_couriers():
         data_of_couriers = cursor.fetchall()
     data_of_couriers_valide = []
     if len(data_of_couriers) == 0:
-        #return HTTPException(status_code=404, detail="Not found")
         return {}
     else:
         data_of_couriers_valide.append(
@@ -249,7 +245,7 @@ async def get_couriers_with_limit_and_offset(limit, offset):
         data_of_couriers = cursor.fetchall()
     data_of_couriers_valide = []
     if len(data_of_couriers) == 0:
-        return HTTPException(status_code=404, detail="Not found")
+        return {}
     else:
         for i in range(len(data_of_couriers)):
             data_of_couriers_valide.append(
